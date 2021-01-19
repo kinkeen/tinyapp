@@ -18,3 +18,12 @@ app.listen(PORT, () => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+app.get("/set", (req, res) => {
+  const a = 1;
+  res.send(`a = ${a}`);
+ });
+ 
+ app.get("/fetch", (req, res) => {
+  res.send(`a = ${a}`);
+ });
