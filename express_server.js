@@ -37,7 +37,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
 const generateRandomString = function(num) {
   const letter = 'abcdefghijklmnopqrstuvwxyz'.split('')
   const number = '123456790'.split('')
