@@ -98,12 +98,6 @@ app.get('/login', (req, res) => {
   res.render('url_login', templatedVars)
 });
 
-
-app.post('/logout', (req, res) => {
-  res.clearCookie('user_id')
-  res.redirect('/urls')
-});
-
 app.post('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/urls');
