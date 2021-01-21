@@ -13,6 +13,14 @@ const urlDatabase = {
 
 
 //.....app routes..........
+app.get('/', (req, res) => {
+  res.send('Hello!')
+});
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase )
+});
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -30,6 +38,24 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post('/urls', (req, res) => {
   console.log(req.body)
   res.send('received new url')
+})
+
+app.get('/u/:shortURL', (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL] 
+  res.redirect(longURL)
+  
+})
+
+app.post('/urls', (req, res) => {
+  const shortURL = generateRandomString();
+  res.redirect(`/u/${shortURL}`)
+  urlDatabase[shortURL] = req.body.longURL;
+  console.log (urlDatabase);
+})
+
+app.post('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL]
+  res.redirect('/urls')
 })
 
 //-----listen----------
