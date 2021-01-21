@@ -8,7 +8,17 @@
         <div class="navbar-nav">
           <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+          <a class="nav-item nav-link" href="/login">Login</a>
+          <a class="nav-item nav-link" href="/register">Register</a>
         </div>
       </div>
+      <% if (!user) { %>
+        <form method="POST" action="/login" class="form-inline">
+        </form> <% } else { %>
+          <p> Logged in as: <%=user.email%></p>
+          <form method="POST" action="/logout" class="form-inline">
+          <button type="submit" style="background-color:transparent; border-color:darkslategray; color:darkslategray" class="btn btn-primary">Logout</button>
+        </form>
+        <% } %>
     </nav>
   </header>
