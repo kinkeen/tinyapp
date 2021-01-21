@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require('body-parser');
 const cookies = require('cookie-parser')
+const bcrypt = require('bcrypt');
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -14,22 +16,18 @@ const users = {
   "userRandomID": {
     id: 'userRandomID',
     email: 'user@example.com',
-    password: 'purple-monkey-dinosaur'
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
   "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   }
 }
 
 const urlDatabase = {
-  //"b2xVn2": "http://www.lighthouselabs.ca",
-  //"9sm5xK": "http://www.google.com"
-
-  // b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  // i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
-
+  //b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  //i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 //.....app routes..........
@@ -43,7 +41,6 @@ app.get('/', (req, res) => {
 });
 
 app.get("/urls.json", (req, res) => {
-  //res.json(urlDatabase )
   res.json(users)
 });
 
@@ -55,7 +52,6 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
 app.get('/urls/new', (req,res)=>{
   const cookey = req.cookies['user_id']
   if (!checkCookie(cookey, users)) {
@@ -65,12 +61,10 @@ app.get('/urls/new', (req,res)=>{
       user: users[req.cookies['user_id']],
     };
     res.render('urls_new', templateVars)
-    console.log("gggggggggggggggg")
     res.redirect('/urls')
   }
   
 })
-
 
 app.post('/login', (req, res) => {
   const email = req.body.email;
@@ -81,7 +75,8 @@ app.post('/login', (req, res) => {
     res.statusCode = 403;
     res.send("User cannot be found")
   } else if (emailLookUp(email, users)) {
-    if (users[user_id].password !== password) {
+    //if (users[user_id].password !== password) {
+    if (!bcrypt.compareSync(password, users[user_id].password)) {
       res.statusCode = 403;
       res.send("Username or password does not match")
     } else {
@@ -104,18 +99,11 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls')
 });
 
-app.get('/register', (req, res) => {
-  const templatedVars = { 
-    user: users[req.cookies['user_id']],
-    urls: urlDatabase
-  }
-  res.render('urls_registration', templatedVars)
-});
-
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id')
   res.redirect('/urls')
 });
+
 app.get('/register', (req, res) => {
   const templatedVars = { 
     user: users[req.cookies['user_id']],
@@ -127,7 +115,8 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   const user_id = generateRandomString(4);
   const userEmail = req.body.email;
-  const userPassword = req.body.password;
+  //const userPassword = req.body.password;
+  const userPassword = bcrypt.hashSync(req.body.password, 10)
 
   if (!userEmail || !userPassword) {
     res.statusCode = 400;
@@ -208,10 +197,13 @@ app.post("/urls/:id", (req, res) => {
   }
 });
 
+
 //-----listen----------
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+//-----listen----------
+
 
 const generateRandomString = function(num) {
   const letter = 'abcdefghijklmnopqrstuvwxyz'.split('')
