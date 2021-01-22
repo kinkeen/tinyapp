@@ -17,10 +17,10 @@
     <% if (!user) { %>
       <form method="POST" action="/login" class="form-inline"></form> 
     <% } else { %>
-        <p> Logged in as: <%=user.email%></p>
+        <p style="margin-bottom: 0px;"> <b>Logged in as:</b><%=user.email%></p>
         <form method="POST" action="/logout" class="form-inline">
-        <button type="submit" style="background-color:transparent; border-color:darkslategray; color:darkslategray" class="btn btn-primary">Logout</button>
-      </form>
+           <button type="submit" style="background-color:transparent; border-color:transparent; color:rgb(249, 250, 250)" class="btn btn-primary">Logout</button>
+        </form>
     <% } %>
-  </nav>
+   </nav>
 </header>

@@ -6,19 +6,18 @@ const cookieSession = require('cookie-session');
 const app = express();
 const PORT = 8080; // default port 8080
 
-const { generateRandomString, emailLookUp, getUserByEmail, checksession, urlsForUser} = require('./helper');
+const { generateRandomString, emailLookUp, getUserByEmail, checksession, urlsForUser} = require('./helpers');
 
+//setting ejs as the new engine
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-//app.use(cookies())
-
 app.use(cookieSession({
   name: 'session',
-  keys: ['LIGHTHOUSE']
+  keys: ['LIGHTHOUSE-HOUSELIGHT']
 }));
 
-//.......User Object..............
 
+//.......User Object..............
 const users = {
   "userRandomID": {
     id: 'userRandomID',
@@ -33,10 +32,12 @@ const users = {
   }
 }
 
+//.......urlDatabase Object..............
 const urlDatabase = {};
 
-//.....app routes..........
+//.....ROUTES..........
 
+//.....GET '/'..........
 app.get('/', (req, res) => {
   const cookey = req.session.user_id;
   if (checksession(cookey, users)) {
@@ -46,10 +47,12 @@ app.get('/', (req, res) => {
   }
 });
 
+//.....GET '/urls.json'..........
 app.get("/urls.json", (req, res) => {
   res.json(users)
 });
 
+//.....GET '/urls'..........
 app.get("/urls", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
@@ -58,7 +61,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
+//.....GET '/urls/new'..........
 app.get('/urls/new', (req,res)=>{
   const cookey = req.session.user_id;
   if (!checksession(cookey, users)) {
@@ -71,6 +74,7 @@ app.get('/urls/new', (req,res)=>{
   }
 });
 
+//.....POST '/login'..........
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -89,6 +93,7 @@ app.post('/login', (req, res) => {
   } 
 });
 
+//.....GET '/login'..........
 app.get('/login', (req, res) => {
   const templatedVars = {
     user: users[req.session.user_id],
@@ -97,11 +102,13 @@ app.get('/login', (req, res) => {
   res.render('url_login', templatedVars)
 });
 
+//.....POST '/logout'..........
 app.post('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/urls');
 });
 
+//.....GET '/register'..........
 app.get('/register', (req, res) => {
   const templatedVars = {
     user: users[req.session.user_id],
@@ -110,6 +117,7 @@ app.get('/register', (req, res) => {
   res.render('urls_registration', templatedVars)
 });
 
+//.....POST '/register'..........
 app.post('/register', (req, res) => {
   const user_id = generateRandomString(4);
   const userEmail = req.body.email;
@@ -132,6 +140,7 @@ app.post('/register', (req, res) => {
     res.redirect('/urls');
 });
 
+//.....GET '/urls/:shortURL'..........
 app.get("/urls/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const templatedVars = {
@@ -141,12 +150,12 @@ app.get("/urls/:shortURL", (req, res) => {
       longURL: urlDatabase[req.params.shortURL].longURL
     };
     res.render('urls_show', templatedVars);  
-    //res.render('urls_show', templatedVars)
   } else {
     res.status(404).send("The short URL you entered does not correspond with a long URL at this time.");
   }
 });
 
+//.....GET '/u/:shortURL'..........
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL].longURL 
@@ -158,8 +167,8 @@ app.get('/u/:shortURL', (req, res) => {
   } 
 });
 
+//.....POST '/urls'..........
 app.post("/urls", (req, res) => {
-
    if (req.session.user_id) {
     const shortURL = generateRandomString(6);
     urlDatabase[shortURL] = {
@@ -172,6 +181,7 @@ app.post("/urls", (req, res) => {
   } 
 });
 
+//.....POST '/urls/:shortURL/delete'..........
 app.post('/urls/:shortURL/delete', (req, res) => {
   const userID = req.session.user_id;
   const useUrl = urlsForUser(userID, urlDatabase);
@@ -183,6 +193,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 })
 
+//.....POST '/urls/:id'..........
 app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   const useUrl = urlsForUser(userID, urlDatabase);
@@ -199,4 +210,4 @@ app.post("/urls/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-//-----listen----------
+
